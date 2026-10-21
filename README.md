@@ -109,6 +109,8 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 浏览器访问 http://127.0.0.1:8000 ，默认管理员 `admin / admin123`。首次登录带强制改密标志：**没改密码前，除「读自己 / 改密码」两个接口外全部返回 403**（服务端拦，不是只弹个前端框）。
 
+想直接看提取效果：仓库里带了 10 个模拟单据（`模拟项目/模拟数据/`，TXT×5 / CSV×2 / DOCX / XLSX / 小票照片 JPG，覆盖生产、出货、退货、盘点五类业务），拖到「上传单据」页就能看到规格条目自动入账；产品档案里没有的规格会进「待确认」队列，正好走一遍人工确认那条分支。
+
 开发模式（前端热更新）：双击 `start.bat`，或手动另开终端在 `frontend/` 执行 `node node_modules/vite/bin/vite.js`，访问 http://localhost:5173 。
 
 ## 配置大模型 API（留空占位，自己填）
@@ -196,7 +198,8 @@ paper2ledger-ai/
 ├── VERSION.txt / requirements-frozen.txt（backend/）
 ├── backend/   # FastAPI 后端（app/ 源码、.env 配置、data/ 生产数据、restore_backup.py）
 ├── frontend/  # Vue3 前端（src/ 源码、dist/ 构建产物由后端托管）
-├── docs/      # 对标分析、调研笔记
+├── docs/      # 对标分析、调研笔记、界面截图
+├── 模拟项目/模拟数据/   # 10 个模拟单据（5 格式 × 5 类业务），可直接上传体验
 └── tests/     # smoke_test.py 回归测试、mock_llm.py、测试素材
 ```
 

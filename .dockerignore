@@ -1,0 +1,19 @@
+# 构建上下文：既瘦身，也防止本机运行数据被烤进镜像层
+# （backend/data/ 里的 app.db 含 settings 表的明文 LLM Key，uploads/ 是原始单据）
+.git
+.gitignore
+.dockerignore
+.zcode/
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.venv/
+**/*.log
+backend/data/
+backend/.env
+frontend/node_modules/
+frontend/dist/
+docs/
+tests/
+模拟项目/
+*.md

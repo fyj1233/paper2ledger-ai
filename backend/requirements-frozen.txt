@@ -1,6 +1,7 @@
 # 依赖锁定快照（2026-09-02，Python 3.14 / Windows 实测）
 # 仅作版本参考：新机器建议优先用 requirements.txt（宽松版本）安装，
 # 只有当宽松版本出问题时才用本文件精确复现：pip install -r requirements-frozen.txt
+aiosqlite==0.22.1
 altair==6.2.2
 annotated-doc==0.0.5
 annotated-types==0.7.0
@@ -43,6 +44,7 @@ langchain-openai==1.6.0
 langchain-protocol==0.0.19
 langgraph==1.2.11
 langgraph-checkpoint==4.2.0
+langgraph-checkpoint-sqlite==3.1.1
 langgraph-prebuilt==1.1.0
 langgraph-sdk==0.4.4
 langsmith==0.12.1

@@ -393,11 +393,12 @@ function renderCharts() {
   trendChart.setOption({
     tooltip: { trigger: 'axis' },
     legend: { data: ['产量', '出货量', '出货金额'], top: 0 },
-    grid: { left: 50, right: 55, top: 32, bottom: 26 },
+    grid: { left: 62, right: 62, top: 32, bottom: 26 },
     xAxis: { type: 'category', data: c.trend.dates },
     yAxis: [
-      { type: 'value', name: '数量' },
-      { type: 'value', name: '金额(元)', splitLine: { show: false } },
+      // 轴名放成竖排：放在轴顶端会和图例挤在同一行
+      { type: 'value', name: '数量', nameLocation: 'middle', nameGap: 44 },
+      { type: 'value', name: '金额(元)', nameLocation: 'middle', nameGap: 46, splitLine: { show: false } },
     ],
     series: [
       { name: '产量', type: 'bar', barMaxWidth: 22, itemStyle: { color: '#1677ff', borderRadius: [3, 3, 0, 0] }, data: c.trend.production },

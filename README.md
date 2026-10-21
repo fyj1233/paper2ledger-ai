@@ -193,13 +193,12 @@ cd backend && python restore_backup.py /path/to/backup_xxx.zip   # 有确认提�
 
 ```
 paper2ledger-ai/
-├── 项目手册.md / AGENTS.md / CHANGELOG.md  # 架构手册、开发指南、版本变化
-├── docs/roadmap.md / docs/development-log.md   # 任务清单、开发日志
+├── 项目手册.md / AGENTS.md / CHANGELOG.md   # 架构手册、开发指南、版本变化
 ├── install.bat / install.sh / start.bat / start.sh   # 一键安装与启动
-├── requirements-frozen.txt（backend/）
+├── docker-compose.yml / Dockerfile / .env.example
 ├── backend/   # FastAPI 后端（app/ 源码、.env 配置、data/ 生产数据、restore_backup.py）
 ├── frontend/  # Vue3 前端（src/ 源码、dist/ 构建产物由后端托管）
-├── docs/      # 对标分析、调研笔记、界面截图
+├── docs/      # roadmap 任务清单、development-log 开发日志、对标分析、调研笔记、界面截图
 ├── 模拟项目/模拟数据/   # 10 个模拟单据（5 格式 × 5 类业务），可直接上传体验
 └── tests/     # smoke_test.py 回归测试、mock_llm.py、测试素材
 ```

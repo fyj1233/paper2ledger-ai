@@ -1,68 +1,79 @@
-# AGENTS.md — 智能体接手须知
+# AGENTS.md
 
-你正在接手「一纸成账 Paper2Ledger」（螺母等轻工业品的每日台账——文档上传 → LLM/模板提取规格条目 → 产品匹配 → 台账/看板；2026-09-02 定名，前身「经营分析系统」→「财账分析系统」）。
+面向 AI 编程助手（Codex / Claude Code / Cursor / Aider 等）的仓库说明书，同时也是人类贡献者的开发指南。
+README.md 面向使用者，本文面向**要改这个仓库代码的人**。
 
-## 必读（按顺序）
-1. **`项目手册.md`** — 完整架构、数据模型、API 清单、23 条已知坑
-2. **`PROGRESS.md`** — 任务清单（从这里领任务）+ 更新日志
-3. `docs/对标分析.md` — 架构设计依据
+## 项目概览
 
-## 铁律（违反会破坏生产数据或约定）
-1. 禁止删除 `backend/data/`（生产数据库与上传文件）
-2. 禁止修改 `backend/.env` 中 LLM 配置的值
-3. 禁止把项目数据发送到外部地址；禁止 git push
-4. 只做 PROGRESS.md 第一个未勾选任务，完成即写日志停止
-5. SQLite 给旧表加列必须走 `app/migrations.py`（create_all 不改旧表）
-6. 跑 smoke_test 前备份 LLM 配置（settings 表 llm* 键，含主 llm_* 三键与备用 llm_backup_* 三键），跑完恢复——测试开头会主动清空 LLM 配置（保证文档走模板/规则提取不依赖外网）。备份/恢复用 `tests/_llm_backup.py backup|restore`
-7. 安全红线（本仓库是公开的，别把这些改回去）：`JWT_SECRET` 不许留可用的默认值或占位符（缺失即随机生成，见 config.py）；账号口令不许写进 README/手册/PROGRESS/测试代码，测试脚本一律读环境变量；Excel 导出新增列必须走 `services/xlsx_out.append_row`（防公式注入）；解压备份包只能用 `ZipFile.extract`，不许手工拼路径写文件
+一纸成账 Paper2Ledger：面向中小型工厂（螺母等轻工业品）的每日台账系统。上传单据 → 解析转文字 →
+模板/规则/大模型三级级联提取规格条目 → 产品匹配自动出入库 → 台账流水、看板与报表；
+另有一个 LangGraph 智能体负责台账问答与图表化周报/月报。
 
-## 验证（每次改动后）
+后端 FastAPI + SQLAlchemy 2 + SQLite（`backend/`，默认端口 8000）；前端 Vue 3 + Vite + Element Plus + ECharts
+（`frontend/`，构建产物由后端托管）。角色三级：admin / manager / employee。
+
+## 文档索引
+
+| 文件 | 内容 |
+|---|---|
+| `README.md` | 功能与界面截图、安装部署、**安全与部署边界** |
+| `项目手册.md` | 完整架构、数据模型、API 清单、已知坑 |
+| `CHANGELOG.md` | 按版本的功能变化 |
+| `docs/development-log.md` | 开发日志：逐条记录实现方式与验证结果 |
+| `docs/roadmap.md` | 任务清单与后续计划 |
+| `docs/对标分析.md` | 架构设计依据（为什么长成这样） |
+
+## 环境与构建
+
 ```bash
-cd tests && python smoke_test.py                          # 98 项回归，需后端在运行（地址用 SMOKE_BASE 覆盖），可重复跑
-cd frontend && node node_modules/vite/bin/vite.js build   # ★ 前端必须 rebuild，勿用 npm run build
+pip install -r backend/requirements.txt          # 后端依赖（Python 3.11+）
+cd backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+cd frontend && npm install
+cd frontend && node node_modules/vite/bin/vite.js build   # 前端构建产物由后端托管
 ```
 
-## 常见坑速记
-- 本机 `npm run dev/build` 不可用（cmd 找不到 node），一律直调 vite.js
-- Git Bash curl 发中文 JSON 要写成 UTF-8 文件 `--data-binary @file`
-- AI 问答是 LangGraph 智能体（`app/services/agent.py`），流式协议 `{"delta"}` / `{"tool"}`；mock 测试用 `tests/mock_llm.py`，测完清空 LLM 配置
-- 台账五类型：initial/production/return 加库存，shipment/scrap 减库存；数量恒正
-- AI 助手已切台账口径（8 工具查 ledger_entries），insights/report_builder 是它的数据层；模型无 relationship，取品名要查 products 表拼映射
-- AI 问答有会话记忆：LangGraph checkpointer 存 `backend/data/agent_memory.db`（`services/agent_memory.py`，thread_id=`chat-{session_id}`）——勿用 glob 在 data 目录找 app.db（会命中它），工具一律硬编码路径
-- AI 报告的图表数字由后端 report_builder 算好存 reports.charts（cards/trend/spec_rank/inventory 四块），LLM 只写文字分析——改口径别让 LLM 编数
-- LLM 有主备双配置：settings 表 llm_*（主）+ llm_backup_*（备用兜底）；提取/报告走 `llm.smart_chat`、智能体走 `with_fallbacks`，主挂自动切备用——升级 langchain 后必须重跑冒烟"主挂切备用"用例
-- 定时备份在 lifespan 的 asyncio 循环（`services/auto_backup.py`），核心打包逻辑在 `services/backup_service.py`（手动/定时共用，勿在路由里重复实现）；备份包含 app.db + agent_memory.db + uploads，当日已有备份则跳过
+改后端代码需要重启进程；改前端代码必须重新 build，否则页面仍是旧产物。
+新增 Python 依赖同步写进 `backend/requirements.txt`，前端依赖写进 `frontend/package.json`。
 
----
+## 测试
 
-## 附录：给新智能体/新会话的开场提示词模板（用户复制用）
-
-**① 继续开发（标准开场）**
-```
-你接手一个已完成大半的项目「一纸成账 Paper2Ledger」（FastAPI + Vue3，螺母等轻工业品的每日台账管理系统，运行端口 8000）。
-请按顺序快速熟悉，不要跳过：
-1. 读 AGENTS.md（接手须知、铁律、验证命令）
-2. 读 项目手册.md（完整架构、数据模型、API 清单、23 条已知坑）
-3. 读 PROGRESS.md（任务清单与更新日志，从第一个未勾选任务继续）
-读完先向我简报三件事：项目现状、你理解的下一步任务、你的实施计划。经我确认后再动手写代码。
-开发约定：所有文案用中文；改动后必须跑 tests/smoke_test.py 回归 + 在 frontend 执行 node node_modules/vite/bin/vite.js build；
-禁止删除 backend/data、禁止修改 backend/.env 的 LLM 配置、禁止把数据发到外部。
+```bash
+cd tests && SMOKE_ADMIN_PASSWORD=<管理员口令> python smoke_test.py    # 98 项回归，需后端已启动
+cd tests && python mock_llm.py                                       # 本地 mock 大模型（8001），离线测 AI 分支
 ```
 
-**② 只修 Bug**
-```
-项目出现此问题：<描述现象/贴报错>
-请先读 AGENTS.md 和 项目手册.md 第 9 节（已知坑）定位原因，告诉我根因和修复方案，经我确认后修复，
-并用 tests/smoke_test.py 回归验证。
-```
+- 冒烟覆盖 RBAC、五种格式解析、三条提取路径、产品匹配与待确认、台账、看板、备份与自动备份、
+  AI 流式问答、会话记忆、可视化报告、主备兜底切换，以及安全用例（公开默认密钥伪造令牌被拒、
+  未改初始密码时接口被拦）。可重复运行，开头会自愈清理上次残留。
+- 冒烟会**清空 LLM 配置**（保证文档走模板/规则、不依赖外网）。跑前备份、跑后恢复：
+  `python tests/_llm_backup.py backup|restore`。
+- 地址与账号一律走环境变量：`SMOKE_BASE` / `SMOKE_ADMIN_PASSWORD` / `SMOKE_ZS_USERNAME` / `SMOKE_ZS_PASSWORD`。
+- 完成的判定标准：前端 build 通过；接口改动有 curl 或冒烟验证；涉及页面的改动在浏览器里看过、控制台无报错。
 
-**③ 只做问答/使用咨询**
-```
-请读 项目手册.md 和 README.md，回答我的问题：<问题>
-```
+## 代码风格
 
-**④ 从备份迁移到新机器**
-```
-请读 README.md 的部署章节和 项目手册.md 第 11 节，帮我在本机完成安装启动，
-并用 backend/restore_backup.py 还原我提供的备份 zip。
-```
+- 界面文案、注释、提交说明一律中文；风格跟随现有文件，不引入新框架。
+- 给 SQLite 旧表加列必须走 `app/migrations.py`（`create_all` 不会改旧表）。
+- 手动备份与定时备份共用 `services/backup_service.py`，不要在路由里重复实现打包逻辑。
+- 台账是流水账：没有独立的库存表，结存一律由 `ledger_entries` 实时聚合；数量恒正，方向由五类型决定
+  （initial/production/return 加，shipment/scrap 减）。
+- 报告与看板的数字由后端 SQL 计算，LLM 只写文字分析。改这条链路时不要让模型产出事实性数字。
+
+## 安全注意事项
+
+本仓库是公开的，以下约束被破坏等于直接把漏洞发布出去。
+
+- `JWT_SECRET` 不得留可用的默认值或模板占位符：缺失时进程内随机生成并告警，`docker compose` 缺该变量直接拒绝启动。
+- 首次登录强制改密由服务端拦截（`app/deps.py`），不要退回"只弹前端"。
+- 账号口令不得写进 README、文档或测试代码，测试脚本一律读环境变量。
+- Excel 导出新增列必须走 `services/xlsx_out.append_row`，防止以 `=` 开头的单据文本被写成公式（CWE-1236）。
+- 解压备份包只能用 `ZipFile.extract`，不要手工拼路径写文件（zip slip）。
+- 上传处理保持"文件名去目录 + 后缀白名单 + 服务端改名 + 只多读 1 字节判限"的写法。
+- 新增涉及单据/台账数据的接口要做员工数据隔离：只能看到自己上传的内容，参考 `documents.py` 的 `_can_view`。
+- 生产数据红线：不删除 `backend/data/`，不修改 `backend/.env` 里的 LLM 配置值，不把业务数据发往外部地址。
+
+## 提交与 PR
+
+- 一次提交做一件事；改动后跑冒烟与前端 build。
+- 每个里程碑在 `docs/development-log.md` 追加一条，写清实现方式与验证结果（含失败过的路径）。
+- 版本级变化同步进 `CHANGELOG.md`。

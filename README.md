@@ -7,8 +7,8 @@
 ![LLM](https://img.shields.io/badge/LLM-OpenAI兼容·主备自动降级-FF6F00)
 ![OCR](https://img.shields.io/badge/OCR-RapidOCR本地离线-2EA043)
 
-> **智能体/开发者接手请先读 [`项目手册.md`](项目手册.md)**（完整架构、数据模型、接口清单、已知的坑），
-> 任务清单与开发进度见 [`PROGRESS.md`](PROGRESS.md)，架构设计依据见 `docs/对标分析.md`。
+> **继续开发请先读 [`项目手册.md`](项目手册.md)**（完整架构、数据模型、接口清单、已知的坑），
+> 任务清单见 [`docs/roadmap.md`](docs/roadmap.md)，开发日志见 [`docs/development-log.md`](docs/development-log.md)，架构设计依据见 [`docs/对标分析.md`](docs/对标分析.md)。
 
 把中小型工厂（螺母等轻工业品）手写的**生产日报、出货单、退货记录、盘点表、收银小票照片**，自动变成能查能算的台账。核心是一条 **AI 提取流水线**：本地 OCR 转文字 → 模板正则 / 规则映射 / 大模型三级级联提取规格条目（品名 / 规格 / 类型 / 数量 / 单价 / 客户）→ 自动匹配产品档案入库；再叠加一个**基于 LangGraph 的台账问答智能体**，用自然语言查产量、出货、库存与异常。未配置大模型时全程降级为规则模式，流程照常可用。
 
@@ -193,9 +193,10 @@ cd backend && python restore_backup.py /path/to/backup_xxx.zip   # 有确认提�
 
 ```
 paper2ledger-ai/
-├── 项目手册.md / PROGRESS.md / AGENTS.md   # ★ 智能体与开发者交接三件套
+├── 项目手册.md / AGENTS.md / CHANGELOG.md  # 架构手册、开发指南、版本变化
+├── docs/roadmap.md / docs/development-log.md   # 任务清单、开发日志
 ├── install.bat / install.sh / start.bat / start.sh   # 一键安装与启动
-├── VERSION.txt / requirements-frozen.txt（backend/）
+├── requirements-frozen.txt（backend/）
 ├── backend/   # FastAPI 后端（app/ 源码、.env 配置、data/ 生产数据、restore_backup.py）
 ├── frontend/  # Vue3 前端（src/ 源码、dist/ 构建产物由后端托管）
 ├── docs/      # 对标分析、调研笔记、界面截图

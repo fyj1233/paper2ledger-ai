@@ -1,4 +1,9 @@
-一纸成账 Paper2Ledger v2.6.0（2026-09-02）
+# 更新日志
+
+格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。逐条的实现方式与验证记录见
+[docs/development-log.md](docs/development-log.md)，任务清单与后续计划见 [docs/roadmap.md](docs/roadmap.md)。
+
+## v2.6.0（2026-09-02）
 
 本版本包含：
 - 台账底座：products / ledger_entries / ledger_edits 数据模型，产品管理 + 工厂台账页（明细/库存结存，SQL 分页）
@@ -16,7 +21,7 @@
 - 品牌（v2.6.0）：系统更名「一纸成账 Paper2Ledger」——登录页/侧栏定制 SVG 品牌标，界面、后端、脚本、文档全链路统一（英文标识 paper2ledger，原 finance-analysis）
 - 已知遗留：旧财务记录/报表接口保留在库（菜单入口已移除）；PDF 条目提取未实测
 
-里程碑：
+## 历史里程碑
 - v1.0.0（2026-09-01）：基础版（上传解析/看板/权限/用户管理）
 - v1.1.0（2026-09-02 上午）：AI 助手/异常预警/图片 OCR/备份
 - v1.2.0（2026-09-02）：对标重构（提取引擎/字典/报表中心）+ LangGraph 智能体 + 前端美化

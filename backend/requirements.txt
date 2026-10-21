@@ -1,0 +1,19 @@
+fastapi>=0.115
+uvicorn[standard]>=0.32
+sqlalchemy>=2.0.40
+pyjwt>=2.10
+bcrypt>=4.2
+python-multipart>=0.0.12
+python-dotenv>=1.0
+python-docx>=1.1
+openpyxl>=3.1
+pdfplumber>=0.11
+httpx>=0.28
+# AI 智能体（经营问答）：带工具的多步推理编排
+langgraph>=0.2
+langgraph-checkpoint-sqlite>=2.0
+aiosqlite>=0.20
+langchain-openai>=0.2
+pillow>=10.0
+# 图片小票 OCR（会自动带 onnxruntime / opencv / numpy）
+rapidocr-onnxruntime>=1.2.3

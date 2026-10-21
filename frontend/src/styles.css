@@ -1,0 +1,95 @@
+/* ===== 全局设计基调 ===== */
+:root {
+  --brand: #1677ff;
+  --brand-deep: #0b1c2c;
+  --success: #52c41a;
+  --warning: #faad14;
+  --danger: #ff4d4f;
+  --text-main: #1f2937;
+  --text-sub: #6b7280;
+  --page-bg: #f3f5f9;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-main);
+  background: var(--page-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 统一卡片：圆角 + 轻阴影 */
+.el-card {
+  border-radius: 12px;
+  border: 1px solid rgba(16, 24, 40, 0.05);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.05) !important;
+}
+
+/* 表格：表头底色 + 行悬浮 */
+.el-table {
+  --el-table-header-bg-color: #f7f9fc;
+  --el-table-row-hover-bg-color: #f0f6ff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.el-table th.el-table__cell {
+  font-weight: 600;
+  color: #475467;
+}
+.el-table .el-table__cell {
+  padding: 10px 0;
+}
+
+/* 按钮/标签/输入框圆角统一 */
+.el-button {
+  border-radius: 8px;
+}
+.el-tag {
+  border-radius: 6px;
+}
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner {
+  border-radius: 8px;
+}
+
+/* 对话框/抽屉圆角 */
+.el-dialog,
+.el-drawer {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.el-drawer {
+  border-radius: 0;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cdd4de;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b6bfcc;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 页面切换淡入 */
+.el-main > div,
+.el-main > .el-card {
+  animation: page-in 0.25s ease;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

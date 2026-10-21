@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    container_name: paper2ledger
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/backend/data
+    environment:
+      # 令牌签名密钥：必须显式提供，否则容器重启后所有登录失效
+      - JWT_SECRET=${JWT_SECRET:?请在 compose 同目录的 .env 里设置 JWT_SECRET=随机字符串}
+      # 大模型 API 配置（也可登录后在「系统设置」页填写）
+      - LLM_API_BASE=${LLM_API_BASE:-}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_MODEL=${LLM_MODEL:-}
+    restart: unless-stopped
